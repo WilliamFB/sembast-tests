@@ -1,0 +1,13 @@
+name: sembast_tests
+description: A test app.
+version: 1.0.0
+
+environment:
+  sdk: '>=2.17.5 <3.0.0'
+
+dependencies:
+  sembast: ^3.3.1+1
+
+dev_dependencies:
+  lints: ^2.0.0
+  test: ^1.16.0  
