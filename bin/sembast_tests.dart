@@ -6,6 +6,7 @@ void main() async {
   final db = await open(dbPath);
   await recordReadWriteDelete(db);
   await readWithDot(db);
+  await finderTest(db);
 }
 
 Future<Database> open(String dbPath) async {
@@ -19,7 +20,9 @@ Future<Database> open(String dbPath) async {
         // Uma transaction adiciona vários dados com apenas uma escrita no banco.
         // Em caso de erro as alterações são revertidas
         await db.transaction((txn) async {
+          await store.add(txn, {'name': 'Myke', 'age': 20});
           await store.add(txn, {'name': 'John', 'age': 20});
+          await store.add(txn, {'name': 'Richard', 'age': 20});
           await store.add(txn, {'name': 'Mark', 'age': 35});
         });
       }
@@ -30,7 +33,7 @@ Future<Database> open(String dbPath) async {
 Future<void> recordReadWriteDelete(Database db) async {
   print('------ recordReadWriteDelete ---');
 
-  var store = StoreRef<String, String>.main();
+  final store = StoreRef<String, String>.main();
 
   // Com o record é possível especificar a key
   await store.record('title').put(db, 'sembast_test_app');
@@ -60,6 +63,26 @@ Future<void> readWithDot(Database db) async {
   final record = await store.record(key).getSnapshot(db);
   final cityName = record?['cityData.name'];
   print('city name: $cityName');
+
+  print('\n');
+}
+
+Future<void> finderTest(Database db) async {
+  print('------ finderTest ---');
+
+  final store = intMapStoreFactory.store('members');
+
+  final membersAge20 = await store.find(
+    db,
+    finder: Finder(
+      filter: Filter.equals('age', 20),
+      sortOrders: [SortOrder('name')],
+    ),
+  );
+
+  for (var member in membersAge20) {
+    print(member.value['name']);
+  }
 
   print('\n');
 }
